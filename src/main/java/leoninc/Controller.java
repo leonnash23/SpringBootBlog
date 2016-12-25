@@ -3,13 +3,11 @@ package leoninc;
 import leoninc.Model.PostList;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpSession;
 
@@ -29,16 +27,6 @@ public class Controller {
     public String index(@RequestParam(value = "name",required = false, defaultValue = "World") String name, Model model){
         model.addAttribute("name", name);
         return "hello";
-    }
-
-    @RequestMapping("/love")
-    public String love(){
-        return "love";
-    }
-
-    @RequestMapping("/test")
-    public String test(){
-        return "src/main/resources/public/readme.txt";
     }
 
     @RequestMapping("/list")
@@ -71,13 +59,17 @@ public class Controller {
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String login(@RequestParam("password") String password, HttpSession session){
         if(password.equals("admin")){
+            log.info("Admin is login");
             session.setAttribute("auto", "admin");
+        } else {
+            log.warn("Somebody tried to login with incorrect password");
         }
         return "redirect:rest/checklogin";
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public String login(HttpSession session){
+        log.info("Admin is logout");
         session.invalidate();
         return "redirect:rest/checklogin";
     }
