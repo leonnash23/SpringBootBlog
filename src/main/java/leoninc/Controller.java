@@ -3,11 +3,13 @@ package leoninc;
 import leoninc.Model.PostList;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpSession;
 
@@ -47,12 +49,20 @@ public class Controller {
     }
 
     @RequestMapping(value = "/createPost", method = RequestMethod.GET)
-    public String createPostForm(){
+    public String createPostForm(HttpSession session){
+        if(session.getAttribute("auto") == null || !session.getAttribute("auto").toString().equals("admin")){
+            return "redirect:/rest/checklogin";
+        }
         return "createPostForm";
     }
 
     @RequestMapping(value = "/createPost", method = RequestMethod.POST)
-    public String createPostConfirm(@RequestParam("title") String title, @RequestParam("text") String text){
+    public String createPostConfirm(@RequestParam("title") String title,
+                                    @RequestParam("text") String text,
+                                    HttpSession session){
+        if(session.getAttribute("auto") == null || !session.getAttribute("auto").toString().equals("admin")){
+            return "redirect:/rest/checklogin";
+        }
         log.info(String.format("Create post: %s,%s",title,text));
         postList.createPost(title, text);
         return "redirect:/list";
@@ -71,7 +81,6 @@ public class Controller {
         session.invalidate();
         return "redirect:rest/checklogin";
     }
-
 
 
 }
