@@ -19,8 +19,12 @@ import javax.servlet.http.HttpSession;
 @Component
 public class Controller {
 
+    private final PostList postList;
+
     @Autowired
-    private PostList postList;
+    public Controller(PostList postList) {
+        this.postList = postList;
+    }
 
 
     @RequestMapping("/")
@@ -30,9 +34,14 @@ public class Controller {
     }
 
     @RequestMapping("/list")
-    public String getList(Model model){
+    public String getList(Model model, HttpSession session){
         log.info("Get list. List size:"+postList.size());
         model.addAttribute("list",postList);
+        if(checkAuto(session)) {
+            model.addAttribute("permission", "admin");
+        }   else {
+            model.addAttribute("permission", "guest");
+        }
         return "list";
     }
 
@@ -72,6 +81,21 @@ public class Controller {
         log.info("Admin is logout");
         session.invalidate();
         return "redirect:rest/checklogin";
+    }
+
+
+    @RequestMapping(value = "/delete", method = RequestMethod.GET)
+    public String deletePost(@RequestParam("id") Long id, HttpSession session){
+        if(!checkAuto(session)){
+            return "redirect:rest/checklogin";
+        }
+        postList.remove(id);
+        return "redirect:/list";
+    }
+
+
+    private boolean checkAuto(HttpSession session){
+        return session.getAttribute("auto") != null && session.getAttribute("auto").toString().equals("admin");
     }
 
 
