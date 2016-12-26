@@ -1,7 +1,5 @@
 package leoninc.Model;
 
-import org.springframework.context.annotation.Bean;
-
 import java.util.Date;
 
 /**
